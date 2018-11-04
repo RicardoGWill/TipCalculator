@@ -34,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
         percentSeekBar = findViewById(R.id.percentSeekBar);
         calculateButton = findViewById(R.id.calculate_button);
 
-        seekbarPercentTextView.setText("15%");
-        percentSeekBar.setProgress(5);
-
         calculateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         percentSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
+            @Override   // The SeekBar has no "MIN" value in old APIs, so 10 must be added
+                        // to the progress, as the bar regularly goes from 0-20, not 10-30.
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 percentTipInt = 10 + ((seekBar.getProgress()));
                 seekbarPercentTextView.setText(String.valueOf(percentTipInt + "%"));
@@ -62,9 +60,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        initialize();
 
     }
 
+    // This initializes the values, so that it starts at 15%.
+    public void initialize() {
+        percentSeekBar.setProgress(5);
+        enteredBillFloat = Float.parseFloat("15.0");
+        seekbarPercentTextView.setText("15%");
+    }
+
+    // This method is called when the "Calculate Tip" button is pressed.
     public void calculate() {
         float resultFloat = 0.0f;
 
@@ -72,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
             enteredBillFloat = Float.parseFloat(billEditText.getText().toString());
             resultFloat = enteredBillFloat * percentTipInt;
 
-            DecimalFormat tipDecimalFormat = new DecimalFormat("###,###,###.##");
-            DecimalFormat totalDecimalFormat = new DecimalFormat("###,###,###.##");
+            DecimalFormat tipDecimalFormat = new DecimalFormat("###,###,###.00");
+            DecimalFormat totalDecimalFormat = new DecimalFormat("###,###,###.00");
 
             tipResultTextView.setText("Tip Amount: $" + (tipDecimalFormat.format(resultFloat/100)));
             totalBillTextView.setText("Total Amount: $" + (totalDecimalFormat.format(enteredBillFloat + resultFloat/100)));
